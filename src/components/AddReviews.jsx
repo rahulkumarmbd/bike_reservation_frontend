@@ -96,7 +96,9 @@ export const AddReview = () => {
         }
       )
       .then(({ data }) => {
-        setReview(initState);
+        setReview((prev) => {
+          return { ...prev, comment: "", rating: "0" };
+        });
         setReviews((prev) => {
           const ids = prev.map((review) => review.id);
           return [

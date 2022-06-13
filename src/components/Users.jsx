@@ -28,7 +28,11 @@ export const Users = () => {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8080/users/${id}`)
+      .delete(`http://localhost:8080/users/${id}`, {
+        headers: {
+          token: cookies.token,
+        },
+      })
       .then(({ data }) => {
         console.log(data);
         fetchUsers();
