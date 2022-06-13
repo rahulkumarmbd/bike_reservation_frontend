@@ -7,10 +7,9 @@ import { Error } from "./Error";
 import { AddBike } from "./AddBike";
 import { Navbar } from "./Navbar";
 import { Users } from "./Users";
-import { ReserveCart } from "./ReserveCart";
-// import CustomPaginationActionsTable from "./reservationTable";
-// import BasicTable from "./reservationTable";
 import DatatablePage from "./reservationTable";
+import { AddReview } from "./AddReviews";
+import { BikeDetails } from "./BikeDetails";
 
 export const RoutesComponent = () => {
   const user = useSelector((store) => store.user);
@@ -36,13 +35,14 @@ export const RoutesComponent = () => {
               path="allreservations/bike/:id"
               element={<DatatablePage />}
             ></Route>
-            <Route
-              path="allreservations"
-              element={<DatatablePage />}
-            ></Route>
+            <Route path="allreservations" element={<DatatablePage />}></Route>
             <Route path="users" element={<Users />}></Route>
+            <Route
+              path="reservation/:reservationId/addreview"
+              element={<AddReview />}
+            ></Route>
             <Route path="adduser" element={<SignUp adduser={true} />}></Route>
-            <Route path="reserve/:id" element={<ReserveCart />}></Route>
+            <Route path="bike/:bikeId" element={<BikeDetails />}></Route>
           </Route>
           <Route path="*" element={<Error />}></Route>
         </Routes>

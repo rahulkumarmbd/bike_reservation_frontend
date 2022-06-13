@@ -1,0 +1,93 @@
+import { Button } from "@chakra-ui/react";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+
+export const Table = ({ data, fetchReservations }) => {
+  const [cookies, setCookies] = useCookies(["token"]);
+  const navigate = useNavigate();
+  const cancelReservation = (reservationId) => {
+    axios
+      .patch(
+        `http://localhost:8080/reservedbike/${reservationId}`,
+        {},
+        {
+          headers: {
+            token: cookies.token,
+          },
+        }
+      )
+      .then(({ data }) => {
+        fetchReservations();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  return (
+    <div>
+      <table>
+        <thead>
+          <tr>
+            {data.columns.map((column, index) => {
+              return <th key={index}>{column.label}</th>;
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {data.rows.map(
+            (
+              {
+                id,
+                fullName,
+                model,
+                location,
+                bookingDate,
+                returnDate,
+                status,
+                Review,
+                cancel,
+                reservationId,
+                bikeId,
+              },
+              index
+            ) => {
+              return (
+                <tr key={index}>
+                  <td>{id}</td>
+                  <td>{fullName}</td>
+                  <td>{model}</td>
+                  <td>{location}</td>
+                  <td>{bookingDate}</td>
+                  <td>{returnDate}</td>
+                  <td>{status}</td>
+                  <td>
+                    <Button
+                      disabled={status !== "active" ? true : false}
+                      colorScheme="blue"
+                      onClick={() =>
+                        navigate(`/home/reservation/${reservationId}/addreview`)
+                      }
+                    >
+                      {Review}
+                    </Button>
+                  </td>
+                  <td>
+                    <Button
+                      colorScheme="red"
+                      disabled={status !== "active" ? true : false}
+                      onClick={() => cancelReservation(reservationId)}
+                    >
+                      {cancel}
+                    </Button>
+                  </td>
+                </tr>
+              );
+            }
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};

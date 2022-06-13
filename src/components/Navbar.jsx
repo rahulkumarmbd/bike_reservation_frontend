@@ -63,6 +63,9 @@ export const Navbar = () => {
           ) : (
             ""
           )}
+          <Link to="/home">
+            <Button colorScheme="teal">Home</Button>
+          </Link>
           <Link
             to="/"
             onClick={() => {

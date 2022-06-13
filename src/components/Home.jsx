@@ -4,9 +4,9 @@ import { useCookies } from "react-cookie";
 import { useLocation } from "react-router-dom";
 import { Bike } from "./Bike";
 import { useSelector } from "react-redux";
-import ReactPaginate from "react-paginate";
 import { Input, Flex, Button } from "@chakra-ui/react";
 import "./components.css";
+import { Paginate } from "./Pagination";
 
 const initState = {
   model: "",
@@ -21,6 +21,8 @@ export const Home = () => {
   const [cookies, setCookies] = useCookies(["token"]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [bookingDate, setBookingDate] = useState();
+  const [returnDate, setReturnDate] = useState();
   const [{ model, color, location, avgRating }, setfilter] =
     useState(initState);
   const user = useSelector((store) => store.user);
@@ -52,6 +54,19 @@ export const Home = () => {
   };
 
   const handleSearch = () => {
+    const condition = !model && !color && !location && !avgRating;
+    if (condition && (!bookingDate || !returnDate)) {
+      return fetchBikes();
+    }
+
+    if (condition && bookingDate && returnDate) {
+      return;
+    }
+
+    if (bookingDate && returnDate) {
+      return fetchNonReservedBikes();
+    }
+
     axios
       .get(
         `http://localhost:8080/bikes/filter?model=${model}&color=${color}&location=${location}&avgRating=${avgRating}&page=${page}&limit=4`,
@@ -62,14 +77,37 @@ export const Home = () => {
         }
       )
       .then(({ data }) => {
-        console.log(data);
         setBikes(data.bikes);
         setTotalPages(data.pages);
+        setfilter(initState);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+  const fetchNonReservedBikes = () => {
+    axios
+      .get(
+        `http://localhost:8080/bikes/nonreserved?bookingDate=${bookingDate}&returnDate=${returnDate}&model=${model}&color=${color}&location=${location}&avgRating=${avgRating}&page=${page}&limit=4`,
+        {
+          headers: {
+            token: cookies.token,
+          },
+        }
+      )
+      .then(({ data }) => {
+        setBikes(data.bikes);
+        setTotalPages(data.pages);
+      });
+  };
+
+  useEffect(() => {
+    if (!bookingDate || !returnDate) {
+      return;
+    }
+    fetchNonReservedBikes();
+  }, [returnDate, bookingDate]);
 
   useEffect(() => {
     fetchBikes();
@@ -78,6 +116,30 @@ export const Home = () => {
   return (
     <div>
       <div>
+        <Flex spacing={3} gap={10} className="searchBikes">
+          <span>Booking Date : </span>
+          <input
+            type="date"
+            min={new Date().toISOString().slice(0, 10)}
+            value={bookingDate}
+            onChange={({ target }) => {
+              if (!returnDate || target.value <= returnDate)
+                setBookingDate(target.value);
+            }}
+          />
+          <span>Return Date : </span>
+          <input
+            min={bookingDate || new Date().toISOString().slice(0, 10)}
+            type="date"
+            value={returnDate}
+            onChange={({ target }) => {
+              if (!bookingDate) {
+                setBookingDate(new Date().toISOString().slice(0, 10));
+              }
+              setReturnDate(target.value);
+            }}
+          />
+        </Flex>
         <Flex spacing={3} gap={10} className="filter">
           <Input
             placeholder="Filter By model"
@@ -108,7 +170,7 @@ export const Home = () => {
             value={avgRating}
           />
           <Button onClick={handleSearch} width={"300px"} colorScheme="teal">
-            Search
+            Filter
           </Button>
         </Flex>
       </div>
@@ -117,43 +179,21 @@ export const Home = () => {
           <div>There is no bikes available</div>
         ) : (
           bikes.map((bike) => {
-            return <Bike key={bike.id} bike={bike} fetchBikes={fetchBikes} />;
+            return (
+              <Bike
+                key={bike.id}
+                bike={bike}
+                fetchBikes={fetchBikes}
+                returnDate={returnDate}
+                bookingDate={bookingDate}
+              />
+            );
           })
         )}
       </div>
       <div style={{ margin: "20px" }}>
         <Paginate pageCount={totalPages} getFunction={setPage} />
       </div>
-    </div>
-  );
-};
-
-const Paginate = ({ pageCount, getFunction }) => {
-  const handlePageClick = async (data) => {
-    let currentPage = data.selected + 1;
-    getFunction(currentPage);
-  };
-  return (
-    <div className="paginate">
-      <ReactPaginate
-        previousLabel={"previous"}
-        nextLabel={"next"}
-        breakLabel={"..."}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={3}
-        onPageChange={handlePageClick}
-        containerClassName={"pagination justify-content-center"}
-        pageClassName={"page-item"}
-        pageLinkClassName={"page-link"}
-        previousClassName={"page-item"}
-        previousLinkClassName={"page-link"}
-        nextClassName={"page-item"}
-        nextLinkClassName={"page-link"}
-        breakClassName={"page-item"}
-        breakLinkClassName={"page-link"}
-        activeClassName={"active"}
-      />
     </div>
   );
 };

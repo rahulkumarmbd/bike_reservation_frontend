@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { MDBDataTable } from "mdbreact";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import { useSelector } from "react-redux";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 import "./components.css";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { Button } from "@chakra-ui/react";
+import { Paginate } from "./Pagination";
+import { Table } from "./Table";
 
 const DatatablePage = () => {
   const [bikes, setBikes] = useState([]);
   const [cookies, setCookies] = useCookies(["token"]);
   const navigate = useNavigate();
-  const user = useSelector((store) => store.user);
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
   const { pathname } = useLocation();
   const { id } = useParams();
 
-  useEffect(() => {
+  const fetchReservations = () => {
     axios
       .get(
         `http://localhost:8080/reservedbike/${
@@ -27,7 +32,7 @@ const DatatablePage = () => {
             : pathname === `/home/allreservations/user/${id}`
             ? `user/${id}`
             : "user"
-        }`,
+        }?limit=10&page=${page}`,
         {
           headers: {
             token: cookies.token,
@@ -35,19 +40,21 @@ const DatatablePage = () => {
         }
       )
       .then(({ data }) => {
-        console.log(data);
+        setTotalPages(data.pages);
         setBikes(
-          data.map((bike, index) => {
+          data.allReservations.map((bike, index) => {
             return {
-              id: index + 1,
-              fullName: bike.userId.fullName,
-              model: bike.bikeId.model,
-              location: bike.bikeId.location,
-              startTime: bike.startTime.slice(0, 16),
-              endTime: bike.endTime.slice(0, 16),
+              id: index + 1 + (page - 1)*10,
+              fullName: bike.user.fullName,
+              model: bike.bike.model,
+              location: bike.bike.location,
+              bookingDate: bike.bookingDate.slice(0, 10),
+              returnDate: bike.returnDate.slice(0, 10),
               status: bike.status,
               Review: "Add Review",
               cancel: "Cancel",
+              reservationId: bike.id,
+              bikeId: bike.bike.id,
             };
           })
         );
@@ -55,73 +62,75 @@ const DatatablePage = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [pathname]);
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [pathname, page]);
 
   const data = {
     columns: [
       {
         label: "S_No.",
         field: "id",
-        sort: "asc",
         width: 100,
       },
       {
         label: "User Name",
         field: "fullName",
-        sort: "asc",
         width: 270,
       },
       {
         label: "Bike Model",
         field: "model",
-        sort: "asc",
         width: 200,
       },
       {
         label: "Location",
         field: "location",
-        sort: "asc",
         width: 200,
       },
       {
-        label: "Initial Date",
-        field: "startTime",
-        sort: "asc",
+        label: "Booking Date",
+        field: "bookingDate",
         width: 150,
       },
       {
-        label: "Final Date",
-        field: "endTime",
-        sort: "asc",
+        label: "Return Date",
+        field: "returnDate",
         width: 150,
       },
       {
         label: "Status",
         field: "status",
-        sort: "asc",
         width: 100,
       },
       {
         label: "Review",
         field: "Review",
-        sort: "asc",
         width: 100,
       },
       {
         label: "Cancel",
         field: "cancel",
-        sort: "asc",
         width: 100,
       },
     ],
     rows: bikes,
   };
 
+  // console.log(data.rows);
+
   return (
     <div style={{ width: "95%", margin: "20px auto" }}>
-      <MDBDataTable striped bordered small hover data={data} />
-      <div style={{display: "flex",justifyContent:"flex-end"}}>
-      <Button colorScheme="red" onClick={() => navigate("/home")}>Back to Home</Button>
+      <Table data={data} fetchReservations={fetchReservations} />
+      <div style={{ margin: "20px" }}>
+        <Paginate pageCount={totalPages} getFunction={setPage} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button colorScheme="red" onClick={() => navigate("/home")}>
+          Back to Home
+        </Button>
       </div>
     </div>
   );

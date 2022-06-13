@@ -2,17 +2,16 @@ import { Rating, Button } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
 import { AddBike } from "./AddBike";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
 
-export const Bike = ({ bike, fetchBikes }) => {
+export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
   const [editBike, setEditBike] = useState(false);
   const [cookies, setCookies] = useCookies(["token"]);
   const navigate = useNavigate();
   const { id, model, color, location, available, avgRating } = bike;
   const user = useSelector((store) => store.user);
-  const { pathname } = useLocation();
 
   const handleDelete = (id) => {
     axios
@@ -24,6 +23,34 @@ export const Bike = ({ bike, fetchBikes }) => {
       .then(({ data }) => {
         console.log(data);
         fetchBikes();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const reserveThisBike = () => {
+    if (!bookingDate || !returnDate) {
+      return alert("Please select valid Booking & Return date...");
+    }
+
+    axios
+      .post(
+        `http://localhost:8080/reservedbike`,
+        {
+          bookingDate,
+          returnDate,
+          bikeId: bike.id,
+        },
+        {
+          headers: {
+            token: cookies.token,
+          },
+        }
+      )
+      .then(({ data }) => {
+        console.log(data);
+        navigate("/home/allreservations");
       })
       .catch((err) => {
         console.log(err);
@@ -62,7 +89,7 @@ export const Bike = ({ bike, fetchBikes }) => {
             />
           </div>
           <div className="button">
-            <Button variant="contained">View Details</Button>
+            <Button variant="contained" onClick={() => navigate(`/home/bike/${id}`)}>View Details</Button>
             {user.roles === "manager" ? (
               <Button variant="contained" onClick={() => setEditBike(true)}>
                 Edit
@@ -71,7 +98,11 @@ export const Bike = ({ bike, fetchBikes }) => {
               ""
             )}
             {user.roles === "manager" ? (
-              <Button variant="contained" color="error"  onClick={() => handleDelete(id)}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => handleDelete(id)}
+              >
                 Delete
               </Button>
             ) : (
@@ -94,9 +125,9 @@ export const Bike = ({ bike, fetchBikes }) => {
             {user.roles === "regular" ? (
               ""
             ) : (
-              <Link to={`/home/reserve/${id}`}>
-                <Button variant="contained">Reserve Bike</Button>
-              </Link>
+              <Button variant="contained" onClick={reserveThisBike}>
+                Reserve Bike
+              </Button>
             )}
           </div>
         </div>

@@ -4,7 +4,6 @@ import {
   Checkbox,
   Button,
   Heading,
-  color,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
@@ -16,8 +15,6 @@ const initState = {
   location: "",
   available: false,
 };
-
-const blurState = {};
 
 export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
   const [bikeCredentials, setBikeCredentials] = useState(
