@@ -9,6 +9,7 @@ export const Navbar = () => {
   const user = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const [cookies, setCookies, removeCookie] = useCookies(["token"]);
+  
   return (
     <div>
       <div className="Navbar">

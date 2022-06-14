@@ -7,6 +7,8 @@ import { useSelector } from "react-redux";
 import { Input, Flex, Button } from "@chakra-ui/react";
 import "./components.css";
 import { Paginate } from "./Pagination";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const initState = {
   model: "",
@@ -49,7 +51,7 @@ export const Home = () => {
         setTotalPages(data.pages);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -82,7 +84,7 @@ export const Home = () => {
         setfilter(initState);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -99,7 +101,9 @@ export const Home = () => {
       .then(({ data }) => {
         setBikes(data.bikes);
         setTotalPages(data.pages);
-      });
+      }).catch((err) => {
+        toast.error(err.response.data.message);
+      })
   };
 
   useEffect(() => {

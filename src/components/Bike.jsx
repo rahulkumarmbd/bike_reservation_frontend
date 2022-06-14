@@ -5,6 +5,8 @@ import { AddBike } from "./AddBike";
 import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
   const [editBike, setEditBike] = useState(false);
@@ -21,17 +23,17 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
         },
       })
       .then(({ data }) => {
-        console.log(data);
+        toast.success("Successfully deleted")
         fetchBikes();
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
   const reserveThisBike = () => {
     if (!bookingDate || !returnDate) {
-      return alert("Please select valid Booking & Return date...");
+      return toast.error("Please select valid Booking & Return date...");
     }
 
     axios
@@ -49,11 +51,11 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
         }
       )
       .then(({ data }) => {
-        console.log(data);
+        toast.success("this bike is successfully reserved");
         navigate("/home/allreservations");
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -131,7 +133,7 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
             )}
             {user.roles === "regular" ? (
               ""
-            ) : bookingDate && returnDate && bike.available  ? (
+            ) : bookingDate && returnDate && bike.available ? (
               <Button variant="contained" onClick={reserveThisBike}>
                 Book Now
               </Button>

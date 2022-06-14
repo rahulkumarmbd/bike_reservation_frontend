@@ -15,6 +15,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export const initState = {
   fullName: "",
   email: "",
@@ -41,29 +43,31 @@ export const SignUp = ({ adduser }) => {
     setUserCredentials({ ...userCredentials, [name]: value });
   };
 
+  
+
   const handleSubmit = () => {
     const { fullName, email, password, phoneNumber } = userCredentials;
 
     if (fullName.length < 3)
-      return alert("Full name must be at least 3 characters");
-    if (!email.length) return alert("Email is required");
+      return toast.error("Full name must be at least 3 characters");
+    if (!email.length) return toast.error("Email is required");
     if (password.length < 6)
-      return alert("Password must be at least 6 characters");
+      return toast.error("Password must be at least 6 characters");
     if (phoneNumber.length !== 10)
-      return alert("Phone number must be at least 10 digits");
+      return toast.error("Phone number must be at least 10 digits");
 
     axios
       .post("http://localhost:8080/users/register", userCredentials)
       .then(({ data }) => {
         if (adduser) {
-          alert("User Added");
+          toast.success("User Added");
           return navigate("/home/users");
         }
-        alert("Registration Successfully");
+        toast.success("Registration Successfully");
         navigate("/");
       })
       .catch((err) => {
-        alert(err.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -109,7 +113,7 @@ export const SignUp = ({ adduser }) => {
             </FormHelperText>
           ) : (
             <FormErrorMessage style={{ marginBottom: "8px" }}>
-              Full Name is required. Your Name should be at least 4 characters
+              Full Name is required. Your Name should be at least 3 characters
             </FormErrorMessage>
           )}
           <FormLabel htmlFor="email">Email</FormLabel>

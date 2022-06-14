@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useParams } from "react-router-dom";
 import { format } from "timeago.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const initState = {
   comment: "",
@@ -53,7 +55,7 @@ export const AddReview = () => {
         setTotalPages(data.pages);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -78,7 +80,7 @@ export const AddReview = () => {
         });
       })
       .catch((err) => {
-        console.error(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -108,9 +110,10 @@ export const AddReview = () => {
         });
         fetchReservation();
         setTotalPages(data.pages);
+        toast.success("Successfully add review");
       })
       .catch((err) => {
-        console.error(err);
+        toast.error(err.response.data.message);
       });
   };
 

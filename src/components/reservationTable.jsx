@@ -9,7 +9,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@chakra-ui/react";
 import { Paginate } from "./Pagination";
 import { Table } from "./Table";
-import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DatatablePage = () => {
   const [bikes, setBikes] = useState([]);
@@ -60,7 +61,7 @@ const DatatablePage = () => {
         );
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 

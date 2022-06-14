@@ -4,6 +4,8 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { Paginate } from "./Pagination";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Users = () => {
   const [usersArr, setUserArr] = useState([]);
@@ -24,7 +26,7 @@ export const Users = () => {
         setTotalPages(data.pages);
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -36,17 +38,17 @@ export const Users = () => {
         },
       })
       .then(({ data }) => {
-        console.log(data);
+        toast.success("successfully deleted");
         fetchUsers();
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [page]);
 
   if (user.roles === "regular") {
     return (

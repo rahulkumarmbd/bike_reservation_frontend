@@ -12,6 +12,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useDispatch } from "react-redux";
 import { Add_User } from "../Redux/actions";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const initState = {
   email: "",
   password: "",
@@ -32,23 +34,21 @@ export const Login = () => {
     const { email, password } = userCredentials;
 
     if (email === "" || password.length < 6) {
-      return alert("Please Enter required fields");
+      return toast.error("Please Enter required fields");
     }
 
     axios
       .post("http://localhost:8080/users/login", userCredentials)
       .then(({ data }) => {
-        alert(data.message);
+        toast.success(data.message);
         if (data.message === "login successful") {
-          console.log(data);
           setCookies("token", data.token);
           dispatch(Add_User(data.user));
           navigate("/home");
         }
       })
       .catch((err) => {
-        console.log("err", err);
-        // alert("Something Went Wrong,Please Enter Valid Fields");
+        toast.error(err.response.data.message);
       });
   };
 

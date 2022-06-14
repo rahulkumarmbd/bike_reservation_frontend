@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const initState = {
   model: "",
   color: "",
@@ -35,10 +37,12 @@ export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
   };
 
   const handleEdit = () => {
-    if (!bikeCredentials.model.length) return alert("Model can't be empty");
-    if (!bikeCredentials.color.length) return alert("Color can't be empty");
+    if (!bikeCredentials.model.length)
+      return toast.error("Model can't be empty");
+    if (!bikeCredentials.color.length)
+      return toast.error("Color can't be empty");
     if (!bikeCredentials.location.length)
-      return alert("location can't be empty");
+      return toast.error("location can't be empty");
 
     axios
       .patch(
@@ -51,17 +55,25 @@ export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
         }
       )
       .then(({ data }) => {
-        console.log(data);
         setBikeCredentials(initState);
         setEditBike(false);
         fetchBikes();
+        toast.success("successfully updated")
       })
       .catch((err) => {
-        alert(err.message);
+        toast.error(err.response.data.message);
       });
   };
 
   const handleAdd = () => {
+    if (!bikeCredentials.model.length)
+      return toast.error("Model can't be empty");
+    if (!bikeCredentials.color.length)
+      return toast.error("Color can't be empty");
+    if (!bikeCredentials.location.length)
+      return toast.error("location can't be empty");
+
+
     axios
       .post("http://localhost:8080/bikes", bikeCredentials, {
         headers: {
@@ -69,11 +81,12 @@ export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
         },
       })
       .then(({ data }) => {
+        toast.success("successfully added")
         setBikeCredentials(initState);
         navigate("/home");
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 

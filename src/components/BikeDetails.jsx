@@ -4,6 +4,8 @@ import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Reviews } from "./AddReviews";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const BikeDetails = () => {
   const [bike, setBike] = useState({});
@@ -15,14 +17,18 @@ export const BikeDetails = () => {
   const { bikeId } = useParams();
 
   const fetchData = async (url) => {
-    return await axios.get(
-      `http://localhost:8080/${url}?limit=4&page=${page}`,
-      {
-        headers: {
-          token: cookies.token,
-        },
-      }
-    );
+    try {
+      return await axios.get(
+        `http://localhost:8080/${url}?limit=4&page=${page}`,
+        {
+          headers: {
+            token: cookies.token,
+          },
+        }
+      );
+    } catch (err) {
+      toast.error(err.response.data.message);
+    }
   };
 
   useEffect(() => {
@@ -39,6 +45,9 @@ export const BikeDetails = () => {
   useEffect(() => {
     (async () => {
       const fetchedReviews = await fetchData(`comments/${bikeId}`);
+      if (!fetchedReviews) {
+        return toast.error("Not able to fetch reviews");
+      }
       setReviews((prev) => {
         const ids = prev.map((review) => review.id);
         return [

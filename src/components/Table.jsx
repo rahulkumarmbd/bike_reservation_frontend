@@ -3,6 +3,8 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Table = ({ data, fetchReservations }) => {
   const [cookies, setCookies] = useCookies(["token"]);
@@ -21,9 +23,10 @@ export const Table = ({ data, fetchReservations }) => {
       )
       .then(({ data }) => {
         fetchReservations();
+        toast.success("Reservation is successfully canceled.");
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(err.response.data.message);
       });
   };
 

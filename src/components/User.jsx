@@ -3,6 +3,8 @@ import { Stack, Input, Button, Radio, RadioGroup } from "@chakra-ui/react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const User = ({ user, handleDelete, fetchUsers }) => {
   const [editUser, setEditUser] = useState(false);
@@ -88,11 +90,12 @@ const EditUser = ({ user, fetchUsers, setEditUser }) => {
         }
       )
       .then(({ data }) => {
+        toast.success("successfully updated");
         fetchUsers();
         setEditUser(false);
       })
       .catch((err) => {
-        alert(err.message);
+        toast.error(err.response.data.message);
       });
   };
 
