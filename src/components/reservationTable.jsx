@@ -5,14 +5,11 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap-css-only/css/bootstrap.min.css";
 import "mdbreact/dist/css/mdb.css";
 import "./components.css";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@chakra-ui/react";
 import { Paginate } from "./Pagination";
 import { Table } from "./Table";
+import { useSelector } from "react-redux";
 
 const DatatablePage = () => {
   const [bikes, setBikes] = useState([]);
@@ -40,11 +37,12 @@ const DatatablePage = () => {
         }
       )
       .then(({ data }) => {
+        console.log(data);
         setTotalPages(data.pages);
         setBikes(
           data.allReservations.map((bike, index) => {
             return {
-              id: index + 1 + (page - 1)*10,
+              id: index + 1 + (page - 1) * 10,
               fullName: bike.user.fullName,
               model: bike.bike.model,
               location: bike.bike.location,
@@ -55,6 +53,8 @@ const DatatablePage = () => {
               cancel: "Cancel",
               reservationId: bike.id,
               bikeId: bike.bike.id,
+              userId: bike.user.id,
+              commentId: bike.comment?.id,
             };
           })
         );

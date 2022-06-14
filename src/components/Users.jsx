@@ -3,12 +3,14 @@ import { User } from "./User";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { Paginate } from "./Pagination";
+import { useSelector } from "react-redux";
 
 export const Users = () => {
   const [usersArr, setUserArr] = useState([]);
   const [cookies, setCookies] = useCookies(["token"]);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
+  const user = useSelector((store) => store.user);
 
   const fetchUsers = () => {
     axios
@@ -45,6 +47,14 @@ export const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  if (user.roles === "regular") {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        UnAuthorized Route
+      </div>
+    );
+  }
 
   return (
     <>

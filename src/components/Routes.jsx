@@ -26,22 +26,31 @@ export const RoutesComponent = () => {
         <Routes>
           <Route path="/home" element={<Navbar />}>
             <Route path="" element={<Home />}></Route>
-            <Route path="addBike" element={<AddBike />}></Route>
-            <Route
-              path="allreservations/user/:id"
-              element={<DatatablePage />}
-            ></Route>
-            <Route
-              path="allreservations/bike/:id"
-              element={<DatatablePage />}
-            ></Route>
+            {user.roles !== "regular" ? (
+              <>
+                <Route path="addBike" element={<AddBike />}></Route>
+                <Route
+                  path="allreservations/user/:id"
+                  element={<DatatablePage />}
+                ></Route>
+                <Route
+                  path="allreservations/bike/:id"
+                  element={<DatatablePage />}
+                ></Route>
+                <Route
+                  path="adduser"
+                  element={<SignUp adduser={true} />}
+                ></Route>
+                <Route path="users" element={<Users />}></Route>
+              </>
+            ) : (
+              ""
+            )}
             <Route path="allreservations" element={<DatatablePage />}></Route>
-            <Route path="users" element={<Users />}></Route>
             <Route
               path="reservation/:reservationId/addreview"
               element={<AddReview />}
             ></Route>
-            <Route path="adduser" element={<SignUp adduser={true} />}></Route>
             <Route path="bike/:bikeId" element={<BikeDetails />}></Route>
           </Route>
           <Route path="*" element={<Error />}></Route>

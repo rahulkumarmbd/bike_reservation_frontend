@@ -1,10 +1,12 @@
 import { Button } from "@chakra-ui/react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export const Table = ({ data, fetchReservations }) => {
   const [cookies, setCookies] = useCookies(["token"]);
+  const user = useSelector((store) => store.user);
   const navigate = useNavigate();
   const cancelReservation = (reservationId) => {
     axios
@@ -50,6 +52,8 @@ export const Table = ({ data, fetchReservations }) => {
                 cancel,
                 reservationId,
                 bikeId,
+                userId,
+                commentId,
               },
               index
             ) => {
@@ -64,7 +68,11 @@ export const Table = ({ data, fetchReservations }) => {
                   <td>{status}</td>
                   <td>
                     <Button
-                      disabled={status !== "active" ? true : false}
+                      disabled={
+                        status !== "active" || userId !== user.id || commentId
+                          ? true
+                          : false
+                      }
                       colorScheme="blue"
                       onClick={() =>
                         navigate(`/home/reservation/${reservationId}/addreview`)
@@ -76,7 +84,11 @@ export const Table = ({ data, fetchReservations }) => {
                   <td>
                     <Button
                       colorScheme="red"
-                      disabled={status !== "active" ? true : false}
+                      disabled={
+                        status !== "active" || userId !== user.id
+                          ? true
+                          : false
+                      }
                       onClick={() => cancelReservation(reservationId)}
                     >
                       {cancel}

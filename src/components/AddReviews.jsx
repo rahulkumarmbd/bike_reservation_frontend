@@ -106,14 +106,13 @@ export const AddReview = () => {
             ...prev,
           ];
         });
+        fetchReservation();
         setTotalPages(data.pages);
       })
       .catch((err) => {
         console.error(err);
       });
   };
-
-  console.log(reviews);
 
   return (
     <div>
@@ -128,37 +127,47 @@ export const AddReview = () => {
         <div>Name:{reservation.user?.fullName}</div>
         <div>Email: {reservation.user?.email}</div>
       </div>
-      <div className="add-review-box">
-        <Input
-          placeholder="Add a comment...."
-          size="md"
-          name="comment"
-          value={review.comment}
-          onChange={(e) =>
-            setReview((prev) => ({ ...prev, comment: e.target.value }))
-          }
+      {!reservation.comment ? (
+        <AddReviewContainer
+          review={review}
+          addReview={addReview}
+          setReview={setReview}
         />
-        <Rating
-          name="simple-controlled"
-          value={+review.rating}
-          onChange={(e) => {
-            setReview((prev) => ({ ...prev, rating: e.target.value }));
-          }}
-        />
-        <Button
-          disabled={!review.comment}
-          onClick={addReview}
-          colorScheme="teal"
-        >
-          Add Review
-        </Button>
-      </div>
+      ) : (
+        ""
+      )}
       <Reviews
         reviews={reviews}
         page={page}
         totalPages={totalPages}
         setPage={setPage}
       />
+    </div>
+  );
+};
+
+const AddReviewContainer = ({ review, addReview, setReview }) => {
+  return (
+    <div className="add-review-box">
+      <Input
+        placeholder="Add a comment...."
+        size="md"
+        name="comment"
+        value={review.comment}
+        onChange={(e) =>
+          setReview((prev) => ({ ...prev, comment: e.target.value }))
+        }
+      />
+      <Rating
+        name="simple-controlled"
+        value={+review.rating}
+        onChange={(e) => {
+          setReview((prev) => ({ ...prev, rating: e.target.value }));
+        }}
+      />
+      <Button disabled={!review.comment} onClick={addReview} colorScheme="teal">
+        Add Review
+      </Button>
     </div>
   );
 };

@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 export const initState = {
   fullName: "",
   email: "",
@@ -25,6 +26,15 @@ export const initState = {
 export const SignUp = ({ adduser }) => {
   const [userCredentials, setUserCredentials] = useState(initState);
   const navigate = useNavigate();
+  const user = useSelector((store) => store.user);
+
+  if (adduser && user.roles === "regular") {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        UnAuthorized Route
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +56,7 @@ export const SignUp = ({ adduser }) => {
       .post("http://localhost:8080/users/register", userCredentials)
       .then(({ data }) => {
         if (adduser) {
-          alert("User Added")
+          alert("User Added");
           return navigate("/home/users");
         }
         alert("Registration Successfully");
@@ -162,7 +172,7 @@ export const SignUp = ({ adduser }) => {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                marginBottom: "10px"
+                marginBottom: "10px",
               }}
             >
               <span>Role : </span>

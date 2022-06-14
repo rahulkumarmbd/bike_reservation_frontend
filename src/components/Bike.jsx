@@ -89,7 +89,12 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
             />
           </div>
           <div className="button">
-            <Button variant="contained" onClick={() => navigate(`/home/bike/${id}`)}>View Details</Button>
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/home/bike/${id}`)}
+            >
+              View Details
+            </Button>
             {user.roles === "manager" ? (
               <Button variant="contained" onClick={() => setEditBike(true)}>
                 Edit
@@ -105,10 +110,12 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
               >
                 Delete
               </Button>
+            ) : bookingDate && returnDate ? (
+              <Button variant="contained" onClick={reserveThisBike}>
+                Reserve Bike
+              </Button>
             ) : (
-              <Link to={`/home/reserve/${id}`}>
-                <Button variant="contained">Reserve Bike</Button>
-              </Link>
+              ""
             )}
             {user.roles === "regular" ? (
               ""
@@ -124,10 +131,12 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
             )}
             {user.roles === "regular" ? (
               ""
-            ) : (
+            ) : bookingDate && returnDate ? (
               <Button variant="contained" onClick={reserveThisBike}>
                 Reserve Bike
               </Button>
+            ) : (
+              ""
             )}
           </div>
         </div>

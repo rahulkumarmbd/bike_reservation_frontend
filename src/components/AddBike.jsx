@@ -1,14 +1,9 @@
-import {
-  Stack,
-  Input,
-  Checkbox,
-  Button,
-  Heading,
-} from "@chakra-ui/react";
+import { Stack, Input, Checkbox, Button, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { useSelector } from "react-redux";
 const initState = {
   model: "",
   color: "",
@@ -21,8 +16,17 @@ export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
     !editBike ? initState : bike
   );
   const [cookies, setCookies] = useCookies(["token"]);
+  const user = useSelector((store) => store.user);
   console.log(bikeCredentials);
   const navigate = useNavigate();
+
+  if (user.roles === "regular") {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        UnAuthorized Route
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     let { name, checked, value } = e.target;
@@ -59,7 +63,7 @@ export const AddBike = ({ editBike, bike, setEditBike, fetchBikes }) => {
 
   const handleAdd = () => {
     axios
-      .post("http://localhost:8080/bikes", bikeCredentials,{
+      .post("http://localhost:8080/bikes", bikeCredentials, {
         headers: {
           token: cookies.token,
         },
