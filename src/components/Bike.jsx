@@ -110,9 +110,9 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
               >
                 Delete
               </Button>
-            ) : bookingDate && returnDate ? (
+            ) : bookingDate && returnDate && bike.available ? (
               <Button variant="contained" onClick={reserveThisBike}>
-                Reserve Bike
+                Book Now
               </Button>
             ) : (
               ""
@@ -131,9 +131,9 @@ export const Bike = ({ bike, fetchBikes, bookingDate, returnDate }) => {
             )}
             {user.roles === "regular" ? (
               ""
-            ) : bookingDate && returnDate ? (
+            ) : bookingDate && returnDate && bike.available  ? (
               <Button variant="contained" onClick={reserveThisBike}>
-                Reserve Bike
+                Book Now
               </Button>
             ) : (
               ""
